@@ -6,7 +6,59 @@ import pandas as pd
 import logging
 import sys
 
-# ================= LOGGING =================
+# AUTHOR: Jerome Justin C. Carolino
+# PROJECT: LGU Real Property Tax System
+# PURPOSE: Government Financial Computation Tool
+#
+# If you are reading this years later:
+#   1. Start from CONSTANTS section.
+#   2. Review calculate_rpt().
+#   3. Review compute().
+# ============================================================
+# LGU REAL PROPERTY TAX SYSTEM
+# ------------------------------------------------------------
+# PURPOSE:
+#   Desktop-based Real Property Tax (RPT) computation system
+#   for Local Government Unit (LGU) use.
+#
+# WHAT THIS SYSTEM DOES:
+#   • Accepts property information (Owner, TD No., PIN, Location)
+#   • Accepts Assessed Property Value
+#   • Accepts range of unpaid tax years
+#   • Computes:
+#         - Basic Real Property Tax (1%)
+#         - SEF (Special Education Fund) Tax (1%)
+#   • Displays per-year breakdown in a dynamic table
+#   • Displays total amount due
+#
+# DESIGN PRINCIPLES:
+#   • Strict input validation
+#   • Decimal for financial accuracy (NO float usage)
+#   • Logging for traceability
+#   • Exception handling for system stability
+#   • Dynamic table resizing for resolution independence
+#
+# LAST UPDATED:
+#   (February 23, 2026)
+# ============================================================
+
+
+
+# ================= LOGGING SYSTEM =================
+# All system events and unexpected errors are recorded
+# in "rpt_system.log".
+#
+#   Government systems require traceability.
+#   If something goes wrong, this file is the first
+#   place to check.
+#
+# LOG FORMAT:
+#   Timestamp - Log Level - Message
+#
+# IMPORTANT:
+#   Do NOT remove logging unless replacing with
+#   enterprise-level monitoring.
+
 logging.basicConfig(
     filename="rpt_system.log",
     level=logging.INFO,
@@ -14,6 +66,19 @@ logging.basicConfig(
 )
 
 # ================= GLOBAL EXCEPTION HANDLER =================
+# This ensures the program never crashes silently.
+#
+# If an unexpected error occurs:
+#   • Error is logged to rpt_system.log
+#   • User sees a friendly message
+#
+# WHY THIS MATTERS:
+#   In government offices, users are not programmers.
+#   The system must fail gracefully.
+#
+# DO NOT REMOVE unless implementing structured
+# exception management across all modules.
+
 def global_exception_handler(exc_type, exc_value, exc_traceback):
     logging.error(f"Unhandled Exception: {exc_value}")
     messagebox.showerror(
@@ -23,7 +88,23 @@ def global_exception_handler(exc_type, exc_value, exc_traceback):
 
 sys.excepthook = global_exception_handler
 
-# ================= CONSTANTS =================
+# ================= TAX & SYSTEM CONSTANTS =================
+# All computation rates and limits are centralized here.
+#
+# TAX RATES:
+#   BASIC_RATE = 1% of assessed value
+#   SEF_RATE   = 1% of assessed value
+#
+# PENALTY SETTINGS:
+#   Currently defined but NOT applied.
+#
+# INPUT LIMITS:
+#   Prevents excessively long input
+#
+# DESIGN RULE:
+#   NEVER hardcode tax rates inside functions.
+#   Always modify them here.
+
 DISCOUNT_RATE = Decimal("0.10")
 BASIC_RATE = Decimal("0.01")
 SEF_RATE = Decimal("0.01")
@@ -44,7 +125,16 @@ LGU_SPINBOX_FONT = ("Segoe UI", 16, "bold")  # bigger font
 
 df_result = None
 
-# ================= ROOT WINDOW =================
+# ================= ROOT WINDOW CONFIGURATION =================
+# Main application window.
+#
+# DESIGN CHOICES:
+#   • Fixed minimum height (940px) to maintain layout integrity
+#   • Responsive width
+#
+# If UI breaks in future screen resolutions,
+# adjust geometry and minsize here.
+
 root = tk.Tk()
 root.title("LGU Real Property Tax System")
 root.geometry("1200x940")
